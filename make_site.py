@@ -38,88 +38,80 @@ def filename_to_title(string):
 def build_main_dir(dir):
 	print("\033[96mBuilding directory: \033[00m" + str(dir))
 	# Make a list of directories with their files
-	subdir_files = [x for x in dir.iterdir() if x.is_file()]
+	subdirs = []
+	for subdir in [x for x in dir.iterdir() if x.is_dir()]: 
+		subdir_files = [x for x in subdir.iterdir() if x.is_file()]
+		subdirs.append(MainDir(subdir.name, subdir_files))
 
 	# Build!!!
 	# ==============
 
 	# Make output directory
-	output_dir = Path("./output")
+	output_dir = Path("./output/" + dir.name)
 	output_dir.mkdir(parents=True, exist_ok=True)
 
 	# Create generic navbar - we'll highlight later
-	navbar_string = "<div id=navbar>\n"
-	navbar_string += "<ol>\n"
-	navbar_string += "	<li class=navbar_title>Aidan Foley<span style=color:#aaa;> | PLACEHOLDER TITLE</span></li>\n"
-	for file in subdir_files:
-		navbar_string += "	<li class=navbar_item><a href='./" + file.name +"'>"+filename_to_title(file.name)+"</a></li>"
-		navbar_string += "\n"
+	navbar_string = "<div id=side_navbar>\n"
+	navbar_string += "<a href='../../index.html'>Back to Homepage</a>"
+	navbar_string += "<h1>" + filename_to_title(dir.name) + "</h1>\n"
+	navbar_string += "<hr/>\n"
+	for subdir in subdirs:
+		#navbar_string += "<div class=section>\n"
+		#navbar_string += "	<h4><a class='section_title'>"+filename_to_title(subdir.name)+"</a></h4>\n"
+		navbar_string += "	<h4>"+filename_to_title(subdir.name)+"</h4>\n"
+		navbar_string += "<ul>"
+		for file in subdir.files:
+			navbar_string += "\n"
+			#navbar_string += "<hr/>"
+			#navbar_string += "\n"
+			navbar_string += "	<li><a href='../" + subdir.name + "/" + file.name +"'>"+filename_to_title(file.name)+"</a></li>"
+			navbar_string += "\n"
+		#navbar_string += "</div\n>"
+		navbar_string += "</ul>"
 
-	navbar_string += "<button id='toggle_dark_mode_button' class='emoji_button' onclick='toggle_dark_mode()'>🌞</button>"
-	navbar_string += "</ol>"
 	navbar_string += "</div>\n"
-	navbar_string += "<div id=navbar_shadow>"
-	navbar_string += "</div>"
-
-	for file in subdir_files:
-		#navbar_string_copy = navbar_string
-		#navbar_string_copy = navbar_string.replace(">"+filename_to_title(file.name), " class='selected'>"+filename_to_title(file.name))
-		navbar_string_copy = navbar_string.replace("<a href='./" + file.name + "'>" + filename_to_title(file.name) + "</a>", "<span>"+filename_to_title(file.name) + "</span>")
-		navbar_string_copy = navbar_string_copy.replace("PLACEHOLDER TITLE", filename_to_title(file.name))
-		navbar_string_copy = navbar_string_copy.replace("Index", "About Me")
-		navbar_string_copy = navbar_string_copy.replace("Resume", "Résumé")
-
-		file_path = "pages/" + file.name
-		file_title = filename_to_title(file.name)
-		# Copy file to output
-		file_str = ""
-		with Path(file_path).open('r') as f:
-			for line in f:
-				file_str += line
-
-		output_file_path = "output/" + file.name
-		Path(output_file_path).touch()
-		with Path(output_file_path).open('w') as f:
-			header_str = ""
-			with Path("./header.html").open('r') as header:
-				for line in header:
-					header_str += line
-			f.write(header_str)
-
-			f.write(navbar_string_copy)
-			f.write('<div id="main">\n')
-
-			f.write(file_str)
-
-			footer_str = ""
-			with Path("./footer.html").open('r') as footer:
-				for line in footer: 
-					footer_str += line
-			f.write(footer_str)
-
-				#f.write('<!doctype html>\n<html>\n\n<head>\n<link rel="stylesheet" href="style.css">\n<meta charset="utf-8"/>\n</head>\n\n<body>')
-				#f.write("\n")
-
-				#f.write("\n<script>")
-				##f.write("div.classList.remove('dark_mode');")
-				#f.write("function myFunction() {\n")
-				#f.write("var element = document.body;\n")
-				#f.write("element.classList.toggle('dark-mode');\n")
-				##f.write("document.cookie = 'dark_mode=true'")
-				#f.write("}\n")
-				#f.write("</script>\n\n")
 
 
-				#f.write(navbar_string_copy)
-				#f.write("\n")
-				#f.write('<div id="main">\n')
-				#f.write("\n")
-				#f.write(file_str)
-				#f.write("\n")
-				#f.write('</div>\n</body>\n</html>\n')
+	for subdir in subdirs:
+		subdir.print()
+		# Make output directory
+		output_subdir = Path("./output/" + dir.name + "/" + subdir.name)
+		output_subdir.mkdir(parents=True, exist_ok=True)
+
+		# Copy stylesheet file
+		shutil.copy(os.getcwd() + "/pages/style.css", os.getcwd() + "/output/" + dir.name + "/" + subdir.name)
+
+		for file in subdir.files:
+			#navbar_string_copy = navbar_string
+			# TODO(cheryl): set the right link as selected
+			navbar_string_copy = navbar_string.replace(">"+filename_to_title(file.name), " class='selected'>"+filename_to_title(file.name))
+#			for line in iter(navbar_string_copy.splitlines()):
+#				if file.name in line:
+#					line = "<h1>AAAAAA</h1>"
+
+			file_path = "pages/" + dir.name + "/" + file.parent.name + "/" + file.name
+			file_title = filename_to_title(file.name)
+			# Copy file to output
+			file_str = ""
+			with Path(file_path).open('r') as f:
+				for line in f:
+					file_str += line
+
+			output_file_path = "output/" + dir.name + "/" + file.parent.name + "/" + file.name
+			Path(output_file_path).touch()
+			with Path(output_file_path).open('w') as f:
+				f.write('<!doctype html>\n<html>\n\n<head>\n<link rel="stylesheet" href="style.css">\n<meta charset="utf-8"/>\n</head>\n\n<body>')
+				f.write("\n")
+				f.write(navbar_string_copy)
+				f.write("\n")
+				f.write('<div id="main">\n')
+				f.write("\n")
+				f.write(file_str)
+				f.write("\n")
+				f.write('</div>\n</body>\n</html>\n')
+			#}
 		#}
 	#}
-#}
 
 def build_main_page():
 	print("Building main page")
@@ -132,7 +124,8 @@ print("Hi!")
 print("I'm now making the site...")
 
 main_dirs = [x for x in pages_dir.iterdir() if x.is_dir()]
-build_main_dir(pages_dir)
+for dir in main_dirs:
+	build_main_dir(dir)
 
 print("And it's been made! Thank you for your service!")
 
