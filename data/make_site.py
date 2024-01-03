@@ -20,9 +20,9 @@ class MainDir:
 			print("	" + file_title + " | " + file_path)
 
 
-non_cap_words = ["the", "an", "a", "at", "by", "to", "and", "but", "for", "and", "as", "as" "," "as", "at", "but", "by", "if", "for", "from", "if", "in", "into", "like", "near", "now", "nor", "of", "off", "on", "once", "onto", "or", "of", "over", "past", "so", "so", "than", "that", "till", "to", "up", "upon", "with", "when", "yet"] # TODO(cheryl): Add and handle multi-words
+non_cap_words = ["the", "an", "a", "at", "by", "to", "and", "but", "for", "and", "as", "as" "," "as", "at", "but", "by", "if", "for", "from", "if", "in", "into", "like", "near", "now", "nor", "of", "off", "on", "once", "onto", "or", "of", "over", "past", "so", "so", "than", "that", "till", "to", "up", "upon", "with", "when", "yet"] # TODO(aidan): Add and handle multi-words
 def filename_to_title(string):
-	# TODO(cheryl): handle hyphens and capitalization
+	# TODO(aidan): handle hyphens and capitalization
 	words = os.path.splitext(string)[0].split('_')
 	title = ""
 	for word in words:
@@ -83,7 +83,7 @@ def build_main_dir(dir):
 
 		for file in subdir.files:
 			#navbar_string_copy = navbar_string
-			# TODO(cheryl): set the right link as selected
+			# TODO(aidan): set the right link as selected
 			navbar_string_copy = navbar_string.replace(">"+filename_to_title(file.name), " class='selected'>"+filename_to_title(file.name))
 #			for line in iter(navbar_string_copy.splitlines()):
 #				if file.name in line:
